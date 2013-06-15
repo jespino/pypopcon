@@ -11,8 +11,10 @@ from .models import App, AppVersion, Environment, Installation
 class Publish(View):
     @method_decorator(csrf_exempt)
     def put(self, request, uuid):
-        env, _ = Environment.objects.get_or_create(uuid=uuid)
+        env, created = Environment.objects.get_or_create(uuid=uuid)
         data = json.loads(request.body)
+        if not created:
+            env.installations.all().delete()
         for data_app in data['apps']:
             app, _ = App.objects.get_or_create(name=data_app['name'])
             version, _ = AppVersion.objects.get_or_create(app=app, version=data_app['version'])

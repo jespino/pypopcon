@@ -11,5 +11,5 @@ class AppVersion(models.Model):
     app = models.ForeignKey(App, null=False, blank=False, related_name="versions")
 
 class Installation(models.Model):
-    environment = models.ForeignKey(Environment, null=False, blank=False, related_name="apps")
+    environment = models.ForeignKey(Environment, null=False, blank=False, related_name="installations")
     app_version = models.ForeignKey(AppVersion, null=False, blank=False, related_name="installations")

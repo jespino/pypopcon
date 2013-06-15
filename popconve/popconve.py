@@ -4,12 +4,22 @@ import requests
 import pip
 import json
 import uuid
+import os
 
 POPCON_URL = "http://localhost:8000/publish/%s/"
 
 def get_uuid():
-    # TODO: Write it in the virtualenv
-    return uuid.uuid4().get_hex()
+    virtual_env_path = os.getenv('VIRTUAL_ENV', '')
+    if virtual_env_path:
+        uuid_file_path = os.path.join(virtual_env_path, 'popcon.uuid')
+        if os.path.isfile(uuid_file_path):
+            return open(os.path.join(virtual_env_path, 'popcon.uuid'), 'r').read().strip()
+        else:
+            generated_uuid = uuid.uuid4().get_hex()
+            open(os.path.join(virtual_env_path, 'popcon.uuid'), 'w').write(generated_uuid)
+            return generated_uuid
+    else:
+        raise Exception('VirtualEnv Needed')
 
 
 def build_installation_data():
