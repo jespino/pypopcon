@@ -8,8 +8,13 @@ class App(models.Model):
 
 class AppVersion(models.Model):
     version = models.CharField(max_length=20, null=False, blank=False)
-    app = models.ForeignKey(App, null=False, blank=False, related_name="versions")
+    app = models.ForeignKey(App, null=False, blank=False,
+                            related_name="versions", on_delete=models.CASCADE)
 
 class Installation(models.Model):
-    environment = models.ForeignKey(Environment, null=False, blank=False, related_name="installations")
-    app_version = models.ForeignKey(AppVersion, null=False, blank=False, related_name="installations")
+    environment = models.ForeignKey(Environment, null=False, blank=False,
+                                    related_name="installations",
+                                    on_delete=models.CASCADE)
+    app_version = models.ForeignKey(AppVersion, null=False, blank=False,
+                                    related_name="installations",
+                                    on_delete=models.CASCADE)

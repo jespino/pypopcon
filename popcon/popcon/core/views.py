@@ -12,13 +12,16 @@ class Publish(View):
     @method_decorator(csrf_exempt)
     def put(self, request, uuid):
         env, created = Environment.objects.get_or_create(uuid=uuid)
-        data = json.loads(request.body)
+        data = json.loads(request.body.decode('utf-8'))
         if not created:
             env.installations.all().delete()
-        for data_app in data['apps']:
-            app, _ = App.objects.get_or_create(name=data_app['name'])
-            version, _ = AppVersion.objects.get_or_create(app=app, version=data_app['version'])
-            Installation.objects.get_or_create(environment=env, app_version=version)
+        try:
+            for data_app in data['apps']:
+                app, _ = App.objects.get_or_create(name=data_app['name'])
+                version, _ = AppVersion.objects.get_or_create(app=app, version=data_app['version'])
+                Installation.objects.get_or_create(environment=env, app_version=version)
+        except TypeError:
+            return HttpResponse(json.dumps({'result': 'ko'}))
         return HttpResponse(json.dumps({'result': 'ok'}))
 
     @method_decorator(csrf_exempt)
@@ -58,5 +61,5 @@ class Ranking(View):
                 'name': app.name,
                 'downloads': Installation.objects.filter(app_version__app=app).count()
             })
-        response = sorted(response, lambda x, y: -cmp(x['downloads'], y['downloads']))
+        response = sorted(response, key=lambda x: x['downloads'], reverse=True)
         return HttpResponse(json.dumps(response))
